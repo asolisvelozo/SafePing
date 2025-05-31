@@ -2,8 +2,7 @@ import pywhatkit
 from datetime import datetime
 import time
 import cv2
-
-
+import numpy as np
 
 def llamar():
     try:
@@ -19,34 +18,37 @@ def llamar():
     except:
         print("Error al enviar el mensaje, vamos a reintentarlo")
 
+
 def detectarMov():
-    
-    cap= cv2.VideoCapture("http://192.168.0.243:4747/video") #Aca indicamos que tenemos que usar nuestra camara principal
+    video = cv2.VideoCapture("http://192.168.0.101:4747/video")
+    i = 0
+    while True:
+        ret, frame = video.read()
+        if ret == False: break
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        if i == 20:
+            bgGray = gray
+        if i >= 20:
+            dif = cv2.absdiff(gray, bgGray)
+            th = cv2.threshold(dif, 40, 255, cv2.THRESH_BINARY)[1]
+            cnts, _ = cv2.findContours(th, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            #cv2.drawContours(frame, cnts, -1, (0,255,0),2)
+            #cv2.imshow('th', th)
+            for c in cnts:
+                area = cv2.contourArea(c)
+                if area > 9000:
+                    x,y,w,h = cv2.boundingRect(c)
+                    cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0),2)
+                    llamar()
+                    time.sleep(30)
+            cv2.imshow('th', th)
 
-    ret, frame1 = cap.read()
-    ret, frame2 = cap.read()
+        cv2.imshow('Frame',frame)
 
-    while cap.isOpened():
-        gray1= cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
-        gray2= cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
-        diff= cv2.absdiff(gray1, gray2) #Calculamos la diferencia entre el frame 1 y frame 2 (Será un bucle infinito)
-        _, thresh = cv2.threshold(diff, 25,255, cv2.THRESH_BINARY)
-        dilated= cv2.dilate(thresh, None, iterations=3)
-        contours= cv2.findContours(dilated, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        for contour in contours: 
-            if cv2.contourArea(contour) < 500:
-                continue
-            x,y,w,h = cv2.boundingRect(contour)
-            cv2.rectangle(frame1, (x,y), (x+w, y+h), (0,255,0), 2) 
-        
-        cv2.imshow("Detección de movimiento", frame1)
-        frame1=frame2
-        ret, frame2= cap.read()
-
-        if cv2.waitKey(10) & 0xFF == ord('q'): 
+        i = i+1
+        if cv2.waitKey(30) & 0xFF == ord('q'):
             break
-        cap.release()
-        cv2.destroyAllWindows()
+    video.release()
 
 def main():
     detectarMov()
@@ -55,4 +57,5 @@ def main():
 
 # Punto de entrada del programa
 if __name__ == "__main__":
+    main()
     main()
