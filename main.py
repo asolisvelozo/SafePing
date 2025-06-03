@@ -5,11 +5,11 @@ import cv2
 import numpy as np
 import threading
 
-CAMERA_URL = "http://192.168.0.254:4747/video"
+CAMERA_URL = "" #IP DE SU CAMARA
 COOLDOWN_SECONDS = 30
 MIN_CONTOUR_AREA = 9000
 BACKGROUND_CAPTURE_FRAME = 20
-PHONE_NUMBER = "+5491130925820"
+PHONE_NUMBER = "" #ACA COLOCAR SU NUM DE TELEFONO
 
 enviando_mensaje = False
 cooldown = False
