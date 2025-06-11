@@ -5,11 +5,11 @@ import cv2
 import numpy as np
 import threading
 
-CAMERA_URL = "" #IP DE SU CAMARA
+CAMERA_URL = "http://192.168.0.243:4747/video"
 COOLDOWN_SECONDS = 30
 MIN_CONTOUR_AREA = 9000
 BACKGROUND_CAPTURE_FRAME = 20
-PHONE_NUMBER = "" #ACA COLOCAR SU NUM DE TELEFONO
+PHONE_NUMBER = "+5491130925820"
 
 enviando_mensaje = False
 cooldown = False
@@ -22,7 +22,16 @@ def enviar_whatsapp(frame):
         hora_actual = datetime.now().strftime("%H:%M:%S")
         mensaje = f"⚠️ ALERTA: ALGUIEN ENTRÓ A TU HABITACIÓN. Hora: {hora_actual}"
         print("🟡 Enviando WhatsApp...")
-        pywhatkit.sendwhatmsg_instantly(PHONE_NUMBER, mensaje, wait_time=15)
+        #pywhatkit.sendwhatmsg_instantly(PHONE_NUMBER, mensaje, wait_time=10)
+        pywhatkit.sendwhats_image(
+        "+5491130925820",                
+        "screenshot.jpg",               
+        mensaje,       
+        wait_time=10,                    
+        tab_close=True,                
+        close_time=3                    
+        )
+
         print("✅ Mensaje enviado.")
     except Exception as e:
         print("❌ Error al enviar el mensaje:", e)
@@ -94,6 +103,10 @@ def detectarMov():
 
 def main():
     detectarMov()
+
+if __name__ == "__main__":
+    main()
+
 
 if __name__ == "__main__":
     main()
